@@ -103,13 +103,16 @@ class MovieManager:
 
     def filter_movies(self, *args):
         """
-        Filter movies with selected genre
+        Filter movies with selected genre.
+        User can selected one or more genre.
 
         Parameter:
             args (tuple): total genre to be selected from.
 
         Return:
             Dataframe containing args as a genre or empty dataframe.
+
+        example: filter_movies('Thriller', 'Drama')
         """
 
         pattern = '|'.join(list(args))
@@ -155,7 +158,42 @@ class MovieManager:
         else:
             print('Please enter valid data.')
 
-    # def recommend_movie(self, *genre):
+    def recommend_movie(self, *genre):
+        """
+        This function return 5 movie based upon selected genre.
+        Also, return the highest rated movie of same genre.
+
+        Parameter:
+            genre (tuple): total genre to be selected from.
+
+        Return:
+            Dataframe containing 5 recommended movies.
+            Highest rated movie among selected genre.
+
+        example: filter_movies('Thriller', 'Drama')
+        """
+
+        pattern = '|'.join(list(genre))
+        df = self.readcontent_fromcsv(
+        )[['imdbId', 'Title', 'IMDB Score', 'Genre']]
+
+        filtered_frame = df[df['Genre'].str.contains(
+            pattern, case=False, na=False)]
+
+        if filtered_frame.empty:
+            print("No movies found")
+            return
+
+        highest_rated_movie = filtered_frame.sort_values(
+            by=['IMDB Score'], ascending=False)
+
+        # recommend movie based on genre
+        print("Recommended movies are:")
+        print(highest_rated_movie[:11].sample(frac=0.5))
+
+        # highest score in that genre
+        print("The highest movie among the selected genre are is:")
+        print(highest_rated_movie[:1]['Title'])
 
 
 ENCODINGS = 'charmap'
@@ -168,4 +206,5 @@ if __name__ == '__main__':
     # movie_object.display_highestrated_movies(length=5)
     # movie_object.filter_movies('Thriller', 'Drama')
     # movie_object.display_unique_genre()
-    movie_object.rate_movies(123123, 4)
+    # movie_object.rate_movies(123123, 4)
+    movie_object.recommend_movie('Thriller', 'Drama')
