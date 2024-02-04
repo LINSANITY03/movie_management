@@ -145,7 +145,7 @@ class MovieManager:
             df = self.readcontent_fromcsv()
             try:
                 selected_row_index = df.index[df['imdbId'] == movie_id][0]
-            except:
+            except IndexError:
                 print(f'Given id:{movie_id} does not exist.')
                 return
             rounded_float = round(new_rating, 1)
@@ -154,6 +154,8 @@ class MovieManager:
             print(f'Value for id:{movie_id} updated to {rounded_float}.')
         else:
             print('Please enter valid data.')
+
+    # def recommend_movie(self, *genre):
 
 
 ENCODINGS = 'charmap'
@@ -166,4 +168,4 @@ if __name__ == '__main__':
     # movie_object.display_highestrated_movies(length=5)
     # movie_object.filter_movies('Thriller', 'Drama')
     # movie_object.display_unique_genre()
-    # movie_object.rate_movies(112302, 4)
+    movie_object.rate_movies(123123, 4)
