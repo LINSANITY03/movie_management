@@ -32,6 +32,10 @@ class MovieManager:
             Prints all the data with given genre.
         display_unique_genre():
             Prints all unique genre.
+
+        ---Additional Complexity---
+        rate_movies(movie_id, new_rating):
+            Overwrite the imdb score.
     """
 
     def __init__(self, path, encoding):
@@ -79,7 +83,7 @@ class MovieManager:
         mean = self.readcontent_fromcsv()['IMDB Score'].mean()
         print(f"The average score of all movies is {mean:.2f}.")
 
-    def display_highestrated_movies(self, length):
+    def display_highestrated_movies(self, length: int):
         """
         Display selected number of movies with highest score.
 
@@ -126,6 +130,31 @@ class MovieManager:
         unique_genres = df.explode('Genre').unique()
         print(unique_genres)
 
+    def rate_movies(self, movie_id: int, new_rating: float):
+        """
+        Update the imdb Score of a specific movie.
+
+        Parameter:
+            movie_id (int): Specific id of a movie.
+            new_rating (float:.2f): New rating specified by user.
+
+        Return:
+            Successful message or validation error.
+        """
+        if isinstance(movie_id, int) and isinstance(new_rating, (float, int)):
+            df = self.readcontent_fromcsv()
+            try:
+                selected_row_index = df.index[df['imdbId'] == movie_id][0]
+            except:
+                print(f'Given id:{movie_id} does not exist.')
+                return
+            rounded_float = round(new_rating, 1)
+            df.loc[selected_row_index, 'IMDB Score'] = rounded_float
+            df.to_csv(self._path, index=False)
+            print(f'Value for id:{movie_id} updated to {rounded_float}.')
+        else:
+            print('Please enter valid data.')
+
 
 ENCODINGS = 'charmap'
 # change the encodings according to the requirements.
@@ -136,4 +165,5 @@ if __name__ == '__main__':
     # movie_object.averagescore()
     # movie_object.display_highestrated_movies(length=5)
     # movie_object.filter_movies('Thriller', 'Drama')
-    movie_object.display_unique_genre()
+    # movie_object.display_unique_genre()
+    # movie_object.rate_movies(112302, 4)
