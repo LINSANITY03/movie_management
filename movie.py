@@ -1,6 +1,8 @@
 """
 Entrypoint for the application.
 Logic behind the Movie Management system.
+
+pylint- 10/10
 """
 
 import pandas as pd
