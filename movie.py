@@ -15,12 +15,17 @@ class MovieManager:
         _encoding (String): Encoding type for CSV file.
 
     Methods:
+        ---Data Loading---
         readcontent_fromcsv():
             Read the csv file from the path.
         countdata_fromcsv():
             Prints the length of data in csv file.
+
+        ---Advanced manipulation---
         averagescore():
             Prints average movie score.
+        display_selected_movies(length):
+            Display selected list of highest score movies.
     """
 
     def __init__(self, path, encoding):
@@ -68,9 +73,27 @@ class MovieManager:
         mean = self.readcontent_fromcsv()['IMDB Score'].mean()
         print(f"The average score of all movies is {mean:.2f}.")
 
+    def display_selected_movies(self, length):
+        """
+        Display selected number of movies with highest score.
+
+        Parameter:
+            length (int): length of movies to display.
+
+        Return:
+            dataframe with movie name and score in descending order.
+        """
+        if isinstance(length, (int)):
+            dataframe = self.readcontent_fromcsv(
+            ).sort_values(by=['IMDB Score'], ascending=False)
+            print(dataframe[['imdbId', 'Title', 'IMDB Score']][:length])
+        else:
+            print("Enter a valid number.")
+
 
 ENCODINGS = 'charmap'
 if __name__ == '__main__':
     movie_object = MovieManager("./movies.csv", ENCODINGS)
     movie_object.countdata_fromcsv()
     movie_object.averagescore()
+    movie_object.display_selected_movies(length=5)
