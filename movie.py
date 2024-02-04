@@ -4,6 +4,7 @@ Logic behind the Movie Management system.
 """
 
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class MovieManager:
@@ -36,6 +37,12 @@ class MovieManager:
         ---Additional Complexity---
         rate_movies(movie_id, new_rating):
             Overwrite the imdb score.
+        recommend_movie(genre):
+            Return some movies and highest rated movie of given genre.
+
+        ---Chart Creation---
+        chart_distribution():
+            Plot a area graph showing the movie ratings.
     """
 
     def __init__(self, path, encoding):
@@ -170,7 +177,7 @@ class MovieManager:
             Dataframe containing 5 recommended movies.
             Highest rated movie among selected genre.
 
-        example: filter_movies('Thriller', 'Drama')
+        example: recommend_movie('Thriller', 'Drama')
         """
 
         pattern = '|'.join(list(genre))
@@ -195,11 +202,23 @@ class MovieManager:
         print("The highest movie among the selected genre are is:")
         print(highest_rated_movie[:1]['Title'])
 
+    def chart_distribution(self):
+        """
+        Plot a area graph of movie index and its imdb score.
+        """
+        df = self.readcontent_fromcsv()["IMDB Score"]
+        df.plot.area(figsize=(12, 4), subplots=True,
+                     title="Rating Distribution")
+        plt.xlabel("Index")
+        plt.ylabel("Rating")
+        plt.show()
+
 
 ENCODINGS = 'charmap'
 # change the encodings according to the requirements.
 
 if __name__ == '__main__':
+    # update the path to movies.csv file
     movie_object = MovieManager("./movies.csv", ENCODINGS)
     # movie_object.countdata_fromcsv()
     # movie_object.averagescore()
@@ -207,4 +226,5 @@ if __name__ == '__main__':
     # movie_object.filter_movies('Thriller', 'Drama')
     # movie_object.display_unique_genre()
     # movie_object.rate_movies(123123, 4)
-    movie_object.recommend_movie('Thriller', 'Drama')
+    # movie_object.recommend_movie('Thriller', 'Drama')
+    # movie_object.chart_distribution()
