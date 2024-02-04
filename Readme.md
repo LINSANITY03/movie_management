@@ -1,6 +1,7 @@
 # Movie Management system
 
-Python scripts to read csv file to do required data manipulation and basic data handling
+Python scripts to read csv file to do required data manipulation and basic data handling.
+
 **Tools used:**
 
 - Python 3.10
