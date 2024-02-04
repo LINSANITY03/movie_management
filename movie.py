@@ -24,8 +24,14 @@ class MovieManager:
         ---Advanced manipulation---
         averagescore():
             Prints average movie score.
-        display_selected_movies(length):
+        display_highestrated_movies(length):
             Display selected list of highest score movies.
+
+        ---Data Operations---
+        filter_movies(args):
+            Prints all the data with given genre.
+        display_unique_genre():
+            Prints all unique genre.
     """
 
     def __init__(self, path, encoding):
@@ -73,7 +79,7 @@ class MovieManager:
         mean = self.readcontent_fromcsv()['IMDB Score'].mean()
         print(f"The average score of all movies is {mean:.2f}.")
 
-    def display_selected_movies(self, length):
+    def display_highestrated_movies(self, length):
         """
         Display selected number of movies with highest score.
 
@@ -84,16 +90,50 @@ class MovieManager:
             dataframe with movie name and score in descending order.
         """
         if isinstance(length, (int)):
+            # check whether the input is valid integer
             dataframe = self.readcontent_fromcsv(
             ).sort_values(by=['IMDB Score'], ascending=False)
-            print(dataframe[['imdbId', 'Title', 'IMDB Score']][:length])
+            print(dataframe[:length])
         else:
             print("Enter a valid number.")
 
+    def filter_movies(self, *args):
+        """
+        Filter movies with selected genre
+
+        Parameter:
+            args (tuple): total genre to be selected from.
+
+        Return:
+            Dataframe containing args as a genre or empty dataframe.
+        """
+
+        pattern = '|'.join(list(args))
+        df = self.readcontent_fromcsv()
+        filtered_frame = df[df['Genre'].str.contains(
+            pattern, case=False, na=False)]
+        print(filtered_frame)
+
+    def display_unique_genre(self):
+        """
+        Splits the value of Genre column with '|' delimiter and prints unique
+        values.
+
+        Return:
+            List of unique strings.
+        """
+        df = self.readcontent_fromcsv()['Genre'].str.split('|')
+        unique_genres = df.explode('Genre').unique()
+        print(unique_genres)
+
 
 ENCODINGS = 'charmap'
+# change the encodings according to the requirements.
+
 if __name__ == '__main__':
     movie_object = MovieManager("./movies.csv", ENCODINGS)
-    movie_object.countdata_fromcsv()
-    movie_object.averagescore()
-    movie_object.display_selected_movies(length=5)
+    # movie_object.countdata_fromcsv()
+    # movie_object.averagescore()
+    # movie_object.display_highestrated_movies(length=5)
+    # movie_object.filter_movies('Thriller', 'Drama')
+    movie_object.display_unique_genre()
