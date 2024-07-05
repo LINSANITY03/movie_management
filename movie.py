@@ -68,33 +68,31 @@ class MovieManager:
 
         """
         try:
-            df = pd.read_csv(self._path, encoding=self._encoding)
-        except FileNotFoundError:
-            return "Path to the CSV file does not exists."
-        return df
+            return pd.read_csv(self._path, encoding=self._encoding)
+        except FileNotFoundError as e:
+            return f'Could not resove the path: {e}'
 
-    def countdata_fromcsv(self):
+    def get_length(self):
         """
         Takes the dataframe and returns the length of columns.
 
         Return:
             Total number of data (int).
         """
-        print(f"Total number of data: {self.readcontent_fromcsv().shape[0]}.")
+        return self.readcontent_fromcsv().shape[0]
 
-    def averagescore(self):
+    def get_average_score(self):
         """
-        Count and display the average of all movie rating.
+        Count and return the average of all movie rating.
 
         Return:
             Average score of all movie (float:.2f).
         """
-        mean = self.readcontent_fromcsv()['IMDB Score'].mean()
-        print(f"The average score of all movies is {mean:.2f}.")
+        return self.readcontent_fromcsv()['IMDB Score'].mean()
 
-    def display_highestrated_movies(self, length: int):
+    def get_highest_rated_movies(self, length: int):
         """
-        Display selected number of movies with highest score.
+        Return selected number of movies with highest score.
 
         Parameter:
             length (int): length of movies to display.
@@ -102,13 +100,11 @@ class MovieManager:
         Return:
             dataframe with movie name and score in descending order.
         """
-        if isinstance(length, (int)):
+        if not isinstance(length, int):
+            return f"Enter a valid number."
             # check whether the input is valid integer
-            dataframe = self.readcontent_fromcsv(
-            ).sort_values(by=['IMDB Score'], ascending=False)
-            print(dataframe[:length])
-        else:
-            print("Enter a valid number.")
+        return self.readcontent_fromcsv(
+        ).sort_values(by=['IMDB Score'], ascending=False)[:length]
 
     def filter_movies(self, *args):
         """
@@ -126,11 +122,10 @@ class MovieManager:
 
         pattern = '|'.join(list(args))
         df = self.readcontent_fromcsv()
-        filtered_frame = df[df['Genre'].str.contains(
+        return df[df['Genre'].str.contains(
             pattern, case=False, na=False)]
-        print(filtered_frame)
 
-    def display_unique_genre(self):
+    def get_unique_genre(self):
         """
         Splits the value of Genre column with '|' delimiter and prints unique
         values.
@@ -139,8 +134,7 @@ class MovieManager:
             List of unique strings.
         """
         df = self.readcontent_fromcsv()['Genre'].str.split('|')
-        unique_genres = df.explode('Genre').unique()
-        print(unique_genres)
+        return df.explode('Genre').unique()
 
     def rate_movies(self, movie_id: int, new_rating: float):
         """
@@ -153,20 +147,19 @@ class MovieManager:
         Return:
             Successful message or validation error.
         """
-        if isinstance(movie_id, int) and isinstance(new_rating, (float, int)):
-            df = self.readcontent_fromcsv()
-            try:
-                selected_row_index = df.index[df['imdbId'] == movie_id][0]
-            except IndexError:
-                print(f'Given id:{movie_id} does not exist.')
-                return
-            rounded_float = round(new_rating, 1)
-            df.loc[selected_row_index, 'IMDB Score'] = rounded_float
-            df.to_csv(self._path, index=False)
-            print(f'Value for id:{movie_id} updated to {rounded_float}.')
-        else:
-            print('Please enter valid data.')
-
+        if not isinstance(movie_id, int) and isinstance(new_rating, (float, int)):
+            return 'Please enter valid data.'
+        
+        df = self.readcontent_fromcsv()
+        try:
+            selected_row_index = df.index[df['imdbId'] == movie_id][0]
+        except IndexError as e:
+            return f'Given id:{movie_id} does not exist. Warning: {e}'
+        rounded_float = round(new_rating, 1)
+        df.loc[selected_row_index, 'IMDB Score'] = rounded_float
+        df.to_csv(self._path, index=False)
+        return f'Value for id:{movie_id} updated to {rounded_float}.'
+    
     def recommend_movie(self, *genre):
         """
         This function return 5 movie based upon selected genre.
@@ -190,8 +183,7 @@ class MovieManager:
             pattern, case=False, na=False)]
 
         if filtered_frame.empty:
-            print("No movies found")
-            return
+            return "No movies found"
 
         highest_rated_movie = filtered_frame.sort_values(
             by=['IMDB Score'], ascending=False)
